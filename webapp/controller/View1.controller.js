@@ -75,28 +75,90 @@ sap.ui.define([
                 return canvas.toDataURL("image/png");
             },
 
-            // Function to save an image as PNG with specified dimensions
-            saveCapturedImageAsPNG: function (imageElement, width, height) {
-                var canvas = document.createElement("canvas");
-                canvas.width = imageElement.width;
-                canvas.height = imageElement.height;
-                var context = canvas.getContext("2d");
-                context.drawImage(imageElement, 0, 0, imageElement.width, imageElement.height);
-                var dataURL = canvas.toDataURL("image/png");
+            // First Creates a record in backend and onsuccess uploads the image to the recorID
+            onCreateMediaRecord: function(){
+
+                var that = this; // Store reference to the controller
+
+                var url = "https://se-demo-sdcplatformdbrs-dev-mediademo-srv.cfapps.eu10.hana.ondemand.com/media-server/Media";
+                var recordId = parseInt( this.getView().byId("numericInput").getValue());
+
+
+                $.ajax({ 
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify({
+                        id: recordId,
+                        mediaType: "image/png"
+                    }),
+                    dataType: "json",
+                    async: false,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(data, textStatus, xhr){        
+                        console.log("success: " + data + " " + JSON.stringify(xhr));
+                        that.onUploadMeidaFile(recordId);
+                    },
+                    error: function (e,xhr,textStatus,err,data) {
+                        console.log(e);
+                        console.log(xhr);
+                        console.log(textStatus);
+                        console.log(err);
+                    }
+                })
+            
+            },
+
+             // Function to save an image as PNG with specified dimensions and upload file
+             onUploadMeidaFile(recordId) {
+                var oCapturedImage = document.getElementById("image1"); // Adjust the ID to match your HTML element
+
+                // Convert base64 to binary data
+                var binaryData = atob(oCapturedImage.src.split(',')[1]);
+
+                // Convert binary data to Uint8Array
+                var uint8Array = new Uint8Array(binaryData.length);
+                for (var i = 0; i < binaryData.length; i++) {
+                    uint8Array[i] = binaryData.charCodeAt(i);
+                }
+
+                var blob = new Blob([uint8Array], { type: 'image/png' });
+
+                var oCapturedImage = document.getElementById("image1");  // Adjust the ID to match your HTML element
+                console.log("Base64 Data:", oCapturedImage.src);
+
+                var url = "https://se-demo-sdcplatformdbrs-dev-mediademo-srv.cfapps.eu10.hana.ondemand.com/media-server/Media(" + recordId + ")/content";
+
+                $.ajax({
+                    type: "PUT",
+                    url: url,
+                    data: blob,
+                    contentType: 'image/png',
+                    processData: false, // Important: Don't process the data
+                    success: function(data, textStatus, xhr) {
+                        console.log("Success: " + data + " " + JSON.stringify(xhr));
+                    },
+                    error: function(e, xhr, textStatus, err, data) {
+                        console.log(e);
+                        console.log(xhr);
+                        console.log(textStatus);
+                        console.log(err);
+                    }
+                });
 
                 // Save or process the image as needed (e.g., display, download, etc.)
                 // You can implement your own logic here for saving or processing the image.
 
-                // Create a download link
-                var a = document.createElement("a");
-                a.href = dataURL;
-                a.download = "captured_image.png"; // Set the desired file name
+                // // Create a download link
+                // var a = document.createElement("a");
+                // a.href = dataURL;
+                // a.download = "captured_image.png"; // Set the desired file name
 
-                // Simulate a click on the download link
-                a.click();
+                // // Simulate a click on the download link
+                // a.click();
 
             },
 
+            
             onSaveImage: function () {
                 var oView = this.getView();
                 var oCapturedImage = oView.byId("capturedImage");

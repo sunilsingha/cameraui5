@@ -1,7 +1,6 @@
 <mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="camerapp.controller.View1" displayBlock="true">
     <Page id="page" title="{i18n>title}">
         <content>
-            
             <VBox id="vBox1">
             <FlexBox id='flexbox1' justifyContent="SpaceBetween">
               <ComboBox id="cameraSource" selectionChange="onCameraSourceChange">
@@ -11,17 +10,16 @@
                     </items>
               </ComboBox>
                     <items>
-
                         <core:HTML id="cameraPreview" content='&lt;video id="video1" autoplay playsinline muted style="width: 50%; height: auto;"&gt;&lt;/video&gt;' />
                         <VBox id='vBox2'>
                             <Button id="btn1" text="Start Camera" press="onStartCamera" />
                             <Button id="btn2" text="Stop Camera" press="onStopCamera" />
                             <Button id='btn3' text="Capture Image" press="onCaptureImage" />
-                            <Button id='btn4' text="Save Image" press="onSaveImage" />
                             <Button id='btn5' text="Cancel" press="onCancel" />
+                            <Input id="numericInput" type="Number" placeholder="Enter numeric value" />
+                            <Button id='btn7' text="Create Record" press="onCreateMediaRecord" />
+                            <!-- <Button id='btn6' text="Uplaod" press="onUploadMeidaFile" /> -->
                         </VBox>
-                       
-
                     </items>
                  </FlexBox>
                   <core:HTML id="capturedImage" content='&lt;img id="image1" style="display: block;" /&gt;' />
